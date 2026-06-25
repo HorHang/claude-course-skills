@@ -12,6 +12,7 @@ figures/
 !examples/figures/
 !examples/figures/*.png
 !examples/figures/*.mp4
+!examples/figures/*.gif
 
 # OS / editor
 .DS_Store

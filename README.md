@@ -20,9 +20,7 @@ A static diagram tells you what a thing **is**. An animation shows you what **pr
 Here's one it builds for a notoriously slippery idea — **PagedAttention**, the trick that lets [vLLM](https://arxiv.org/abs/2309.06180) serve LLMs ~2–4× faster. Press play — the whole KV-cache memory problem *and its fix*, in about 40 seconds:
 
 <p align="center">
-  <video src="https://github.com/HorHang/claude-course-skills/raw/main/examples/figures/pagedattention.mp4" poster="https://github.com/HorHang/claude-course-skills/raw/main/examples/figures/pagedattention_poster.png" controls muted playsinline width="820">
-    <img alt="PagedAttention explainer (click to play): the problem (a contiguous KV cache wastes 60–80% of GPU memory), the idea (page the cache into fixed-size blocks like OS virtual memory), the mechanism (a block table maps logical→physical blocks for the prompt 'Four score and seven years ago our', allocating a new block only on demand), and the payoff (near-zero waste packs in many more requests)." src="https://github.com/HorHang/claude-course-skills/raw/main/examples/figures/pagedattention_poster.png" width="820">
-  </video>
+  <a href="examples/figures/pagedattention.mp4" title="Click for the full-quality MP4 with audio/controls"><img alt="PagedAttention explainer: the problem (a contiguous KV cache wastes 60–80% of GPU memory), the idea (page the cache into fixed-size blocks like OS virtual memory), the mechanism (a block table maps logical→physical blocks for the prompt 'Four score and seven years ago our', allocating a new block only on demand), and the payoff (near-zero waste packs in many more requests)." src="examples/figures/pagedattention.gif" width="820"></a>
   <br>
   <em>▶ <a href="https://github.com/HorHang/claude-course-skills/raw/main/examples/figures/pagedattention.mp4">Play the 38-second explainer</a> — rendered with <a href="https://github.com/3b1b/manim">manim</a></em>
 </p>
@@ -32,9 +30,7 @@ Here's one it builds for a notoriously slippery idea — **PagedAttention**, the
 And motion isn't just for memory layouts — it's how you teach **geometry you can't draw flat**. Here's a chapter on the [Muon optimizer](https://kellerjordan.github.io/posts/muon/) (the trick that trains GPT-style models ~2× faster than AdamW) answering *"why does orthogonalizing the update actually help training?"* — by dropping two optimizers into the **same 3D loss valley** and letting you watch them walk:
 
 <p align="center">
-  <video src="https://github.com/HorHang/claude-course-skills/raw/main/examples/figures/muon_loss_landscape.mp4" poster="https://github.com/HorHang/claude-course-skills/raw/main/examples/figures/muon_loss_landscape_poster.png" controls muted playsinline width="820">
-    <img alt="Muon loss-landscape explainer (click to play): an ill-conditioned least-squares problem drawn as a 3D valley. SGD-momentum (grey) and Muon (orange) start at the same point and run the same number of steps — SGD climbs the steep wall and oscillates side-to-side, stalling high on the slope, while Muon orthogonalizes its step and flows along the valley floor down to a ~1.7x lower loss." src="https://github.com/HorHang/claude-course-skills/raw/main/examples/figures/muon_loss_landscape_poster.png" width="820">
-  </video>
+  <a href="examples/figures/muon_loss_landscape.mp4" title="Click for the full-quality MP4 with audio/controls"><img alt="Muon loss-landscape explainer: an ill-conditioned least-squares problem drawn as a 3D valley. SGD-momentum (grey) and Muon (orange) start at the same point and run the same number of steps — SGD climbs the steep wall and oscillates side-to-side, stalling high on the slope, while Muon orthogonalizes its step and flows along the valley floor down to a ~1.7x lower loss." src="examples/figures/muon_loss_landscape.gif" width="820"></a>
   <br>
   <em>▶ <a href="https://github.com/HorHang/claude-course-skills/raw/main/examples/figures/muon_loss_landscape.mp4">Play the descent</a> — a 3D <a href="https://github.com/3b1b/manim">manim</a> <code>Surface</code> walked step by step, the animated twin of the chapter's static contour</em>
 </p>
