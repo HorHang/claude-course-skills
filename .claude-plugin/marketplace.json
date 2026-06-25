@@ -1,0 +1,33 @@
+{
+  "name": "claude-course-skills",
+  "description": "Skills that turn a GitHub repo, book, or PDF into hands-on, self-paced Jupyter-notebook courses — with an AI tutor that quizzes you through them.",
+  "version": "1.0.0",
+  "owner": {
+    "name": "HorHang",
+    "url": "https://github.com/HorHang"
+  },
+  "plugins": [
+    {
+      "name": "course-skills",
+      "source": "./",
+      "description": "Turn any GitHub repo, book, or PDF into a hands-on, self-paced course of Jupyter notebooks — then have an AI tutor teach it to you. Bundles build-course, teach-course, and update-course.",
+      "version": "1.0.0",
+      "author": {
+        "name": "HorHang"
+      },
+      "homepage": "https://github.com/HorHang/claude-course-skills",
+      "repository": "https://github.com/HorHang/claude-course-skills",
+      "license": "MIT",
+      "keywords": [
+        "education",
+        "course-generator",
+        "jupyter-notebook",
+        "ai-tutor",
+        "socratic",
+        "learning",
+        "agent-skills"
+      ],
+      "category": "education"
+    }
+  ]
+}
