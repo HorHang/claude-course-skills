@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Generated course artifacts (the skills emit these into a course dir)
+*_build/
+figures/
+# but keep the committed example chapter's figure
+!examples/figures/
+!examples/figures/*.png
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+.pytest_cache/
