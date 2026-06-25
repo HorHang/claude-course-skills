@@ -8,9 +8,10 @@ venv/
 # Generated course artifacts (the skills emit these into a course dir)
 *_build/
 figures/
-# but keep the committed example chapter's figure
+# but keep the committed example chapter's figures
 !examples/figures/
 !examples/figures/*.png
+!examples/figures/*.mp4
 
 # OS / editor
 .DS_Store
