@@ -61,6 +61,7 @@ digraph update {
 | Exercise too hard / too easy | Re-tune to the persona; add a stub or a hint; adjust the asserts. |
 | A claim is wrong or uncited | Correct it and **cite the source** (book section / repo `path:line`). |
 | A query/DSL was paraphrased in Python | Restore the specialized language **verbatim** (```sql / ```cypher), keep generic code only for mapping. |
+| An embedded video has a visual bug (overlap, a box not covering its text) or "doesn't flow" | Edit the scene `.py` (the video's source of truth — like the build script), re-render, re-embed. See build-course references/interactive-visualization.md (overlap-safe layout, no-LaTeX `Text`, persistent-anchor flow, smoke-then-final render). |
 | Cell errors out | Fix the code; the reviewer must pass. |
 
 ## Common Mistakes
