@@ -109,12 +109,17 @@ cells.append(interactive_callout(
 
 **manim scenes (polish tier)** — for a standalone explainer *video* rendered with [manim](https://github.com/3b1b/manim) (the 3Blue1Brown engine), the committed `.mp4`/`.gif` is what readers see, so manim + ffmpeg only need to exist on the machine that regenerates it. manim is the *polish* path; always keep a matplotlib fallback (above) for machines without it. See `examples/build_pagedattention_manim.py` for a full, paper-faithful reference scene.
 
+**No LaTeX — use `Text` (Pango), never `MathTex`/`Tex`.** A box very often has **no LaTeX installed**, so `MathTex(...)`, `Tex(...)`, and `Brace.get_text(...)` all crash the render with `FileNotFoundError: 'latex'` — sometimes only partway through a long scene, after you've waited for it. Author every label with `Text(...)`, which uses Pango and needs no LaTeX. Write math with Unicode/ASCII glyphs in the string: `Ψ`, `→`, `≈`, `×`, `Σ`, `avg = (g0 + g1 + g2 + g3) / N`. For a labelled brace use `Text(...).next_to(brace, DOWN, buff=0.15)` instead of `brace.get_text(...)`. (Confirm Unicode glyphs like `Ψ` render in a frame before the final encode — see QA-by-frame below.)
+
 **Overlap-safe layout — the rule that keeps generated scenes clean.** manim has no auto-layout, so the most common defect is **text colliding with text** — almost always a scene title overlapping the first content row. Prevent it structurally, never by eyeballing coordinates:
 
 1. **Reserve bands.** The title owns the top band, the caption owns the bottom band. *Never* position content with an absolute upward shift (`.shift(UP * k)`) that reaches into the title's row — that is exactly what causes title/content overlap.
 2. **Anchor, then chain.** Place the topmost content element *below the title* with `label.next_to(title, DOWN, buff=0.5)`, then chain each following row with `.next_to(previous, DOWN)`. Relative positioning cannot collide the way hand-tuned coordinates do.
 3. **Fit to frame.** Clamp anything that might exceed the frame: `if m.width > 13: m.scale_to_fit_width(13)` for titles/captions, and `scale_to_fit_width(cell_w * 0.86)` for token text inside a cell.
 4. **One title + one caption per scene**, each ≤ ~70 characters so they stay on a single line.
+5. **Boxes wrap their text — never hardcode a box width.** A highlight/background box sized by a guessed width (`Rectangle(width=6.4)`) won't cover a label whose text is longer, so the text spills out both ends (the classic "the box doesn't cover the text" defect). Derive the box *from* the mobject: `SurroundingRectangle(label, buff=0.15)` or `BackgroundRectangle(label, buff=0.1)`. If you must use a plain `Rectangle`, set `rect.surround(label)` or `rect.match_width(label)` after creating the text, never a literal width.
+
+**Flow: transform one persistent object, don't restart each scene.** Learners follow a concept far better when a single anchor mobject (e.g. a per-device memory bar) *persists and transforms in place* across scenes — replicate it, shard it, re-label it — rather than building a fresh, unrelated diagram per scene. When mirroring a paper, reuse the paper's own anchor figure (e.g. ZeRO Figure 1's params/grads/optimizer bar) so the animation reads as one continuous story instead of disconnected acts.
 
 ```python
 def heading(text):
@@ -128,14 +133,28 @@ label = Text("Logical blocks").next_to(head, DOWN, buff=0.55)  # anchor BELOW th
 row2 = my_group.next_to(label, DOWN, buff=0.3)                 # chain downward
 ```
 
-**QA by frame, not by faith.** A title/content overlap is invisible in the source. After rendering, extract frames and *look* — especially the first frame of every scene (where titles change):
+**QA by frame, not by faith — smoke-render cheap, inspect, then render final.** A title/content overlap (or a LaTeX/Unicode crash) is invisible in the source and a full-quality render is slow, so never spend a `-qh` render on an unverified scene. Render a **low-quality smoke pass first** (`-ql`), extract frames, and *look* — especially the first frame of every scene (where titles change) and any frame called out in feedback (e.g. "at 0:35 the box doesn't cover the text"):
 
 ```bash
-manim -qm --format=mp4 build_<ch>_manim.py SceneName -o out
-ffmpeg -i media/videos/build_<ch>_manim/720p30/out.mp4 -vf fps=1 frames/%03d.png
+manim -ql --format=mp4 build_<ch>_manim.py SceneName -o smoke   # fast draft
+ffmpeg -i media/videos/build_<ch>_manim/480p15/smoke.mp4 -vf fps=2 frames/%03d.png
+# inspect frames/*.png — confirm no text touches other text, every glyph rendered
+manim -qh --format=mp4 build_<ch>_manim.py SceneName -o final    # only after it's clean
 ```
 
 Open the frames and confirm no text touches other text. Only then encode the final `.mp4`/`.gif`. This frame check is the manim equivalent of running `review-notebook.py` — do not skip it.
+
+**Embed the rendered video into a chapter.** The scene `.py` is the **source of truth** for the video, exactly as `build_<ch>.py` is for the notebook — regenerate the `.mp4` from it, never tweak the encoded file. Add the embed via a markdown cell in `build_<ch>.py` (not a hand-edit of the `.ipynb`):
+
+```html
+<video src="videos/<ch>_<topic>.mp4" controls width="720"
+       poster="videos/<ch>_<topic>_thumbnail.png"></video>
+```
+
+- **Always add a fallback link** right after — **GitHub strips `<video>`**, so a reader there sees nothing: ``*If the player doesn't load, open [`videos/<ch>_<topic>.mp4`](videos/<ch>_<topic>.mp4) directly.*``
+- **Generate a poster thumbnail** so the cell isn't blank before play: `ffmpeg -ss 7 -i videos/<ch>_<topic>.mp4 -frames:v 1 videos/<ch>_<topic>_thumbnail.png`.
+- **Commit only the three stable artifacts** — the scene `.py`, the final `.mp4`, the poster `.png` — and delete manim's regenerable intermediates: `rm -rf videos/media videos/__pycache__`.
+- Use relative, repo-rooted paths (`videos/...`), never absolute machine paths.
 
 ## 6. Tool catalog
 

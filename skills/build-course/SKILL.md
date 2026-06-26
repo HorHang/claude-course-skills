@@ -77,7 +77,7 @@ Run the **notebook reviewer** (copy assets/review-notebook.py → `<course>/revi
 ```
 python <course>/review-notebook.py <course>/Chapter_<ch>_<Title>.ipynb
 ```
-It executes every code cell in a shared namespace and — because solutions live in markdown `<details>` and are otherwise never run — **extracts each solution and checks it against its exercise's asserts**. It also flags render-breakers: missing images, malformed `<details>`, unbalanced `$`, mermaid blocks (which some hosts show as raw text/an error), and over-long cells. Fix every ERROR by editing `build_<ch>.py` and re-running — never hand-edit the .ipynb.
+It executes every **Python** code cell in a shared namespace (skipping CUDA/C++/shell/magic cells — `%%writefile x.cu`, `!nvcc …`, `%%bash` — which are not Python and would otherwise raise false-positive `SyntaxError`s) and — because solutions live in markdown `<details>` and are otherwise never run — **extracts each solution and checks it against its exercise's asserts**. It also flags render-breakers: missing images, malformed `<details>`, unbalanced `$`, mermaid blocks (which some hosts show as raw text/an error), and over-long cells. Fix every ERROR by editing `build_<ch>.py` and re-running — never hand-edit the .ipynb.
 Then do the **qualitative pass** the script cannot: fidelity to the source/book (every claim cited) and reading-flow / "aha" progression. See references/notebook-review.md.
 
 ## Quick Reference
@@ -113,6 +113,10 @@ Then do the **qualitative pass** the script cannot: fidelity to the source/book 
 | Hands-on that needs a cluster/prod infra with no escape hatch | Simulate on one machine + add a "Going to production" setup cell. |
 | Unguarded `import manim/plotly/netron` (crashes on a bare machine) | Wrap rich viz try-rich/except-static; degrade to a PNG/text. The reviewer warns on unguarded imports. |
 | Animating a static fact for decoration | Animate only when a variable changes over time/step/parameter; otherwise a still plot or Mermaid. |
+| `MathTex`/`Tex`/`Brace.get_text` in a manim scene (crashes `FileNotFoundError: 'latex'` on a LaTeX-free box) | Use `Text` (Pango) with Unicode/ASCII math (`Ψ`, `→`, `avg = (g0+g1)/N`); label braces with `Text(...).next_to(brace, DOWN)`. |
+| Hardcoding a manim box width so it doesn't cover its label (text spills out) | Size the box from the text: `SurroundingRectangle(label)` / `BackgroundRectangle(label)`, never a literal width. |
+| Rendering manim at `-qh` before verifying the scene | Smoke-render `-ql`, extract frames, inspect (overlap + every glyph), *then* `-qh`. |
+| Embedding a video with only `<video>` (blank on GitHub, which strips it) | Add a fallback `[link](videos/…mp4)` + a `poster=` thumbnail; commit only `.py`+`.mp4`+`.png`, drop `media/`/`__pycache__`. |
 
 ## Red Flags — STOP
 

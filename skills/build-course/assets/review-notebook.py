@@ -28,6 +28,25 @@ def _src(cell: dict) -> str:
     return "".join(s) if isinstance(s, list) else s
 
 
+def _python_source(src: str) -> str | None:
+    """Return the runnable-Python view of a code cell, or None if the cell is
+    Jupyter-only (not valid plain Python).
+
+    A code cell may legitimately be CUDA/C++ (`%%writefile x.cu`), shell
+    (`!nvcc ...`, `%%bash`), or carry line magics (`%matplotlib inline`).
+    Running those through `exec` raises a false-positive SyntaxError, so the
+    reviewer must NOT treat them as Python. A whole-cell magic (`%%...`) means
+    the cell is not Python at all; otherwise drop the shell/magic lines and run
+    whatever real Python remains so genuine errors are still caught."""
+    lines = src.splitlines()
+    first = next((ln for ln in lines if ln.strip()), "")
+    if first.lstrip().startswith("%%"):
+        return None
+    kept = [ln for ln in lines if not ln.lstrip().startswith(("!", "%"))]
+    body = "\n".join(kept)
+    return body if body.strip() else None
+
+
 def _strip_stub(src: str) -> str:
     """Drop a `def ...(): ... raise NotImplementedError` stub, keep the rest
     (the asserts), so a substituted solution can be checked against them."""
@@ -121,8 +140,11 @@ def review(path: str) -> int:
         if i in unguarded_heavy_cells:
             continue  # already flagged (WARN); the missing optional dep would crash here
         src = _src(c)
+        py = _python_source(src)
+        if py is None:
+            continue  # CUDA/C++/shell/magic cell — not Python, would false-positive
         try:
-            exec(compile(src, f"cell[{i}]", "exec"), ns)
+            exec(compile(py, f"cell[{i}]", "exec"), ns)
         except NotImplementedError:
             sol = _solution_after(cells, i)
             if sol is None:
